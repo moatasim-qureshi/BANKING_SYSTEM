@@ -6,7 +6,7 @@ class Account:
     def __init__(self, balance=0):
         self.balance = balance
 
-    def deposit(self):
+    def initial_deposit(self):
         amount = int(input('Enter amount of Deposit:'))
         self.balance += amount
         print('The Amount is successfully deposited into your Account.')
@@ -24,11 +24,12 @@ class Account:
 
 
 class CheckingAccount(Account):
-    def __init__(self, account, credit_limit: int = 3000,user=' '):
+    def __init__(self, account, credit_limit: int = 3000, user=' '):
         super().__init__(account.balance)
         self.credit_limit = credit_limit
-        self.user=user
-    def user_credit(self):
+        self.user = user
+
+    def user_credit (self):
         print(f'We provide a credit limit of Rs.{self.credit_limit} with an overdraft fee of Rs.500.')
         withdraw = int(input('Enter Amount to Withdraw Money from Account:'))
         if withdraw <= self.balance:
@@ -59,8 +60,8 @@ class CheckingAccount(Account):
             print('Withdrawal is not possible as you are exceeding the credit limit of the bank.\n')
 
     def deposit_amount(self):
-        deposit = abs(int(input('Enter Amount to Withdraw Money from Account:')))
-        self.balance+=deposit
+        deposit = abs(int(input('Enter Amount to Deposit Money to the Account:')))
+        self.balance += deposit
         with open('hqhq.txt', 'r+') as file:
             data = file.readlines()
 
@@ -70,7 +71,7 @@ class CheckingAccount(Account):
                     temp_user[5] = str(self.balance)
                     data[index] = (",".join(temp_user) + "\n")
                     with open(self.user + ".txt", "a") as user_file:
-                        user_file.write('CASH WITHDRAWAL,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',' + str(deposit) + '\n')
+                        user_file.write('CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',' + str(deposit) + '\n')
         with open('hqhq.txt', "w") as f:
             for line in data:
                 f.write(line)
@@ -137,7 +138,7 @@ class Customer:
                     break
             self.password = input('Choose a Password for your Bank Account:')
             self.account = Account()
-            self.account.deposit()
+            self.account.initial_deposit()
             self.account.balance_enquiry()
             file.write(
                 f'{self.first_Name},{self.last_Name},{self.address},{self.username},{self.password},{self.account.balance}\n')
@@ -188,7 +189,7 @@ if option == 2:
             print('Press 1 for Loan')
             print('Press 2 for Monthly Interest')
             print('Press 3 to Withdraw Money')
-            print('Press 4 to Deposit MOney')
+            print('Press 4 to Deposit Money')
             print('Press 5 to Exit this Section')
             ask = int(input('Enter Option Number:'))
             if ask == 1:
@@ -198,9 +199,12 @@ if option == 2:
                 interest = SavingAccount(person.account)
                 interest.user_credit()
             elif ask == 3:
-                withdraw = CheckingAccount(person.account,user=person.username)
+                withdraw = CheckingAccount(person.account, user=person.username)
                 withdraw.user_credit()
             elif ask == 4:
+                depo = CheckingAccount(person.account, user=person.username)
+                depo.deposit_amount()
+            elif ask == 5:
                 break
     if opt == 2:
         person = Customer()
