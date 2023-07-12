@@ -1,2 +1,2 @@
-Moatasim,Qureshi,moatasimqureshi,Moat,quresh,30000
-Faseeh,qureshi,faseehqureshi,fas,qur,50000
+Moatasim,qureshi,moatasimqureshi,moat,qur,15000
+faseeeh,qureshi,faseehqureshi,fas,qur,18000
