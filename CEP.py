@@ -1,3 +1,4 @@
+from datetime import datetime
 import time
 
 
@@ -35,19 +36,18 @@ class CheckingAccount(Account):
             print(f'Withdrawal of Amount {withdraw} is successfully completed!\n')
             with open('hqhq.txt', 'r+') as file:
                 data = file.readlines()
-                print(data)
+
                 for index, line in enumerate(data):
                     temp_user = line.strip().split(',')
                     if self.user == temp_user[3]:
                         temp_user[5] = str(self.balance)
                         data[index] = (",".join(temp_user) + "\n")
-                        print(data)
+                        with open(self.user + ".txt", "a") as user_file:
+                            user_file.write('CASH WITHDRAWAL,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") +','+ str(withdraw) + '\n')
+
             with open('hqhq.txt', "w") as f:
                 for line in data:
                     f.write(line)
-
-
-
         elif withdraw <= (self.balance + self.credit_limit):
             print('You do not have sufficient balance, so it will deduct from the credit limit.')
             print('And for this, the overdraft fee is Rs.500')
@@ -57,6 +57,23 @@ class CheckingAccount(Account):
             print(f'Withdrawal of Amount {withdraw} is successfully completed with an overdraft fee of Rs.500\n')
         else:
             print('Withdrawal is not possible as you are exceeding the credit limit of the bank.\n')
+
+    def deposit_amount(self):
+        deposit = abs(int(input('Enter Amount to Withdraw Money from Account:')))
+        self.balance+=deposit
+        with open('hqhq.txt', 'r+') as file:
+            data = file.readlines()
+
+            for index, line in enumerate(data):
+                temp_user = line.strip().split(',')
+                if self.user == temp_user[3]:
+                    temp_user[5] = str(self.balance)
+                    data[index] = (",".join(temp_user) + "\n")
+                    with open(self.user + ".txt", "a") as user_file:
+                        user_file.write('CASH WITHDRAWAL,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',' + str(deposit) + '\n')
+        with open('hqhq.txt', "w") as f:
+            for line in data:
+                f.write(line)
 
 
 class SavingAccount(Account):
@@ -126,6 +143,9 @@ class Customer:
                 f'{self.first_Name},{self.last_Name},{self.address},{self.username},{self.password},{self.account.balance}\n')
             time.sleep(1.5)
 
+            with open(self.username+".txt", "w") as user_file:
+                user_file.write('ACCOUNT CREATED,'+datetime.now().strftime("%d/%m/%Y %H:%M:%S")+',None'+'\n')
+
     def reg_account(self):
         while True:
             self.username = input('Enter your Username:')
@@ -134,6 +154,8 @@ class Customer:
                 for line in file:
                     data = line.strip().split(',')
                     if self.username == data[3] and self.password == data[4]:
+                        with open(self.username + ".txt", "a") as user_file:
+                            user_file.write('SIGNED IN,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',None' + '\n')
                         print(f'Welcome Back {data[0]} {data[1]}')
                         self.account = Account(int(data[5]))
                         print(f'You have a current balance of {data[5]}\n')
@@ -166,7 +188,8 @@ if option == 2:
             print('Press 1 for Loan')
             print('Press 2 for Monthly Interest')
             print('Press 3 to Withdraw Money')
-            print('Press 4 to Exit this Section')
+            print('Press 4 to Deposit MOney')
+            print('Press 5 to Exit this Section')
             ask = int(input('Enter Option Number:'))
             if ask == 1:
                 loan = LoanAccount(person.account)
