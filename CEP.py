@@ -62,7 +62,7 @@ class CheckingAccount(Account):
                             user_file.write('CASH WITHDRAWAL,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") +','+ str(withdraw) + '\n')
 
                         with open('GENERALIZED HISTORY.txt', "a") as user_file:
-                            user_file.write(self.user+':CASH WITHDRAWAL,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                            user_file.write(self.user+' :CASH WITHDRAWAL,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                                             + ',' + str(withdraw) + '\n')
 
             with open('data.txt', "w") as f:
@@ -96,7 +96,7 @@ class CheckingAccount(Account):
                         user_file.write('CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',' + str(deposit) + '\n')
 
                     with open('GENERALIZED HISTORY.txt', "a") as hist_file:
-                        hist_file.write(self.user + 'CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                        hist_file.write(self.user + ' :CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                                         + ',' + str(deposit) + '\n')
 
         with open('data.txt', "w") as f:
@@ -175,7 +175,7 @@ class Customer:
                 user_file.write('ACCOUNT CREATED,'+datetime.now().strftime("%d/%m/%Y %H:%M:%S")+',None'+'\n')
 
             with open('GENERALIZED HISTORY.txt', "a") as hist_file:
-                hist_file.write(self.username+'ACCOUNT CREATED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") +
+                hist_file.write(self.username+' :ACCOUNT CREATED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") +
                                 ',None' + '\n')
 
 
@@ -312,38 +312,48 @@ while True:
                 print()
                 print("     ACCESS GRANTED        ")
                 print()
-                print(f"TO VIEW EACH CUSTOMER FILE PRESS [1]\nFOR COMPLETE INFO A  PERSON [2]:\nFOR OVERALL "
-                      f"TRANSACTION HISTORY PRESS [3]")
+                print(f"TO VIEW EACH CUSTOMER FILE PRESS [1]:\nFOR COMPLETE INFO A  PERSON [2]:\nFOR OVERALL "
+                      f"TRANSACTION HISTORY PRESS [3]:\nPRESS [0] TO EXIT]:")
                 print()
-                choice = int(input("ENTER HERE:"))
 
-                if choice == 1:
-                    with open("data.txt", "r") as f:
-                        number = 1
-                        for line in f:
-                            data = line.strip().split(",")
-                            print(f'{number})NAME:{data[0]}\n  BALANCE:{data[5]}')
-                            number += 1
-                            print()
+                while True:
 
-                elif choice == 2:
-                    print()
-                    take = input("ENTER NAME OF THE PERSON:")
-                    print()
-                    print("LOADING...")
-                    time.sleep(1)
-                    print()
-                    with open("data.txt", "r") as f:
-                        for lines in f:
-                            data = lines.strip().split(",")
-                            if data[3] == take:
-                                print(
-                                    f'NAME: {data[0]}\nLAST NAME: {data[1]}\nEMAIL ADDRESS: {data[2]}\nUSERNAME: {data[3]}\n'
-                                    f'PASSWORD: {data[4]}\nBALANCE:{data[5]}')
+                    choice = int(input("ENTER HERE:"))
 
-                                with open(take+".txt", "a") as user_hist:
-                                    user_trans = user_hist.read()
-                                    print("TRANSACTION HISTORY", user_trans)
+                    if choice == 1:
+                        with open("data.txt", "r") as f:
+                            number = 1
+                            for line in f:
+                                data = line.strip().split(",")
+                                print(f'{number})NAME:{data[0]}\n  BALANCE:{data[5]}')
+                                number += 1
+                                print()
+
+                    elif choice == 2:
+                        print()
+                        take = input("ENTER NAME OF THE PERSON:")
+                        print()
+                        print("LOADING...")
+                        time.sleep(1)
+                        print()
+                        with open("data.txt", "r") as f:
+                            for lines in f:
+                                data = lines.strip().split(",")
+                                if data[3] == take:
+                                    print(
+                                        f'NAME: {data[0]}\nLAST NAME: {data[1]}\nEMAIL ADDRESS: {data[2]}\nUSERNAME: {data[3]}\n'
+                                        f'PASSWORD: {data[4]}\nBALANCE:{data[5]}')
+
+                                    with open(take+".txt") as user_hist:
+                                        user_trans = user_hist.read()
+                                        print("TRANSACTION HISTORY:", user_trans)
+                    elif choice == 3:
+                        print("OVERALL TRANSACTION HISTORY")
+                        print("\nLOADNIG.....\n")
+
+                        with open("GENERALIZED HISTORY.txt","r") as hist:
+                            overall_hist=hist.read()
+                            print("TRANSACTION HISTORY OF BANK\n\n", overall_hist)
 
             elif username == 0 or password == 0:
                 break
@@ -351,9 +361,33 @@ while True:
             else:
                 print("TRY AGAIN\n")
 
-    elif option == 3:
-        break
-
     else:
         print('INVALID INPUT TRYAGAIN')
         print()
+
+
+        # def deposit_amount(self):
+        #     deposit = abs(int(input('Enter Amount to Deposit Money to the Account:')))
+        #     self.balance += deposit
+        #     with open('data.txt', 'r+') as file:
+        #         data = file.readlines()
+        #
+        #         for index, line in enumerate(data):
+        #             temp_user = line.strip().split(',')
+        #             if self.user == temp_user[3]:
+        #                 temp_user[5] = str(self.balance)
+        #                 data[index] = (",".join(temp_user) + "\n")
+        #
+        #                 with open(self.user + ".txt", "a") as user_file:
+        #                     user_file.write(
+        #                         'CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',' + str(
+        #                             deposit) + '\n')
+        #
+        #                 with open('GENERALIZED HISTORY.txt', "a") as hist_file:
+        #                     hist_file.write(
+        #                         self.user + ' :CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        #                         + ',' + str(deposit) + '\n')
+        #
+        #     with open('data.txt', "w") as f:
+        #         for line in data:
+        #             f.write(line)
