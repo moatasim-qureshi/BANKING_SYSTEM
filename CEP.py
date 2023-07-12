@@ -231,5 +231,40 @@ if option == 2:
         print('Thank you for visiting!')
         exit()
 
-    #Moatasim, qureshi, moatasimqureshi, moat, qur, 15000
-    #faseeeh, qureshi, faseehqureshi, fas, qur, 19000
+if option == 1:
+    print()
+    print()
+    print("                            WELCOME TO ADMIN SECTION                      ")
+    print()
+    print()
+    username = int(input("INPUT ID:"))
+    password = int(input("INPUT PASSWORD:"))
+    if username == 123 and password == 123:
+        print()
+        print("     ACCESS GRANTED        ")
+        print()
+        choice = input("TO VIEW EACH CUSTOMER FILE PRESS [C] FOR COMPLETE INFO A  PERSON [S]:").upper()
+        print()
+
+        if choice == "C":
+            with open("hqhq.txt", "r") as f:
+                number = 1
+                for line in f:
+                    data = line.strip().split(",")
+                    print(f'{number})NAME:{data[0]}\n  BALANCE:{data[5]}')
+                    number += 1
+                    print()
+
+        if choice == "S":
+            print()
+            take = input("ENTER NAME OF THE PERSON:")
+            print()
+            print("LOADING...")
+            time.sleep(1)
+            print()
+            with open("hqhq.txt", "r") as f:
+                for lines in f:
+                    data = lines.strip().split(",")
+                    if data[3] == take:
+                        print(
+                            f'NAME: {data[0]}\nLAST NAME: {data[1]}\nEMAIL ADDRESS: {data[2]}\nUSERNAME: {data[3]}\nPASSWORD: {data[4]}\nBALANCE:{data[5]}')
