@@ -1,1 +1,2 @@
-Ihtisham,Qureshi,ihtishamqureshi,ihti,quresh,9500
+Faseeh,qureshi,faseehqureshi,fas,qur,10000
+moatasim,qureshi,moatasimqureshi,moat,qur,990

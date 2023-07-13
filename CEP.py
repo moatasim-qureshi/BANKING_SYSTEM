@@ -3,19 +3,39 @@ import time
 
 
 class Account:
-    def __init__(self, balance=0):
-        self.balance = balance
+    def __init__(self, balance,user=' '):
 
-    def initial_deposit(self):
-        while True:
-            try:
-                amount = int(input('Enter amount of Deposit:'))
-                self.balance += amount
-                print('The Amount is successfully deposited into your Account.\n')
-                break
-            except ValueError:
-                print('Invalid Input!')
-                print('Try Again\n')
+        self.balance = balance
+        self.user=user
+
+    def deposit(self):
+        deposit = abs(int(input('Enter Amount to Deposit Money to the Account:')))
+        self.balance += deposit
+        with open('data.txt', 'r+') as file:
+            data = file.readlines()
+
+            for index, line in enumerate(data):
+                temp_user = line.strip().split(',')
+                if self.user == temp_user[3]:
+                    temp_user[5] = str(self.balance)
+                    data[index] = (",".join(temp_user) + "\n")
+
+                    with open(self.user + ".txt", "a") as user_file:
+                        user_file.write(
+                            'CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',' + str(
+                                deposit) + '\n')
+
+                    with open('GENERALIZED HISTORY.txt', "a") as hist_file:
+                        hist_file.write(
+                            self.user + ' :CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                            + ',' + str(deposit) + '\n')
+
+                    print("\nAMOUNT HAS SUCCESSFULLY DEPOSITED INTO YOUR ACCOUNT")
+            with open('data.txt', "w") as f:
+                for line in data:
+                    f.write(line)
+
+
 
     def withdraw(self):
         amount = int(input('Enter amount of withdrawal:'))
@@ -80,28 +100,9 @@ class CheckingAccount(Account):
         else:
             print('Withdrawal is not possible as you are exceeding the credit limit of the bank.\n')
 
-    def deposit_amount(self):
-        deposit = abs(int(input('Enter Amount to Deposit Money to the Account:')))
-        self.balance += deposit
-        with open('data.txt', 'r+') as file:
-            data = file.readlines()
-
-            for index, line in enumerate(data):
-                temp_user = line.strip().split(',')
-                if self.user == temp_user[3]:
-                    temp_user[5] = str(self.balance)
-                    data[index] = (",".join(temp_user) + "\n")
-
-                    with open(self.user + ".txt", "a") as user_file:
-                        user_file.write('CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',' + str(deposit) + '\n')
-
-                    with open('GENERALIZED HISTORY.txt', "a") as hist_file:
-                        hist_file.write(self.user + ' :CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-                                        + ',' + str(deposit) + '\n')
-
-        with open('data.txt', "w") as f:
-            for line in data:
-                f.write(line)
+        #with open('data.txt', "w") as f:
+        #    for line in data:
+        #        f.write(line)
 
 
 class SavingAccount(Account):
@@ -164,19 +165,20 @@ class Customer:
                 else:
                     break
             self.password = input('Choose a Password for your Bank Account:')
-            self.account = Account()
-            self.account.initial_deposit()
+            self.account = Account(balance=0)
+            self.account.deposit()
             self.account.balance_enquiry()
             file.write(
                 f'{self.first_Name},{self.last_Name},{self.address},{self.username},{self.password},{self.account.balance}\n')
             time.sleep(1.5)
 
             with open(self.username+".txt", "w") as user_file:
-                user_file.write('ACCOUNT CREATED,'+datetime.now().strftime("%d/%m/%Y %H:%M:%S")+',None'+'\n')
+                user_file.write('ACCOUNT CREATED,'+datetime.now().strftime("%d/%m/%Y %H:%M:%S")+','
+                                + str (self.account.balance)+'\n')
 
             with open('GENERALIZED HISTORY.txt', "a") as hist_file:
-                hist_file.write(self.username+' :ACCOUNT CREATED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") +
-                                ',None' + '\n')
+                hist_file.write(self.username+' :ACCOUNT CREATED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") +" "+
+                                str (self.account.balance) + '\n')
 
 
     def reg_account(self):
@@ -192,6 +194,10 @@ class Customer:
                     if self.username == data[3] and self.password == data[4]:
                         with open(self.username + ".txt", "a") as user_file:
                             user_file.write('SIGNED IN,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',None' + '\n')
+
+                        with open('GENERALIZED HISTORY.txt', "a") as user_file:
+                            user_file.write(self.username+' :SIGNED IN,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                                            + ',None' + '\n')
 
                         print()
                         print(f'Welcome Back {data[0]} {data[1]}\n')
@@ -238,11 +244,12 @@ while True:
 
             while True:
                 print('What Operation do you want to perform?\n')
-                print('Press 1 for Loan')
-                print('Press 2 for Monthly Interest')
-                print('Press 3 to Withdraw Money')
-                print('Press 4 to Deposit Money')
-                print('Press 5 to Exit this Section\n')
+                print('Press 1 for Loan:')
+                print('Press 2 for Monthly Interest:')
+                print('Press 3 to Withdraw Money:')
+                print('Press 4 to Deposit Money:')
+                print('Press 5 to View Transaction:')
+                print('Press 6 to Exit this Section\n')
 
                 ask = int(input('Enter Option Number:\n'))
 
@@ -259,10 +266,23 @@ while True:
                     withdraw.user_credit()
 
                 elif ask == 4:
-                    depo = CheckingAccount(person.account, user=person.username)
-                    depo.deposit_amount()
+                    with open("data.txt","r") as f:
+                        data = f.readlines()
 
+                        for lines in data:
+                            data = lines.strip().split(",")
+                            if data[3] == person.username:
+                                current_balance = data[5]
+                    depo = Account(int(current_balance), user=person.username)
+                    depo.deposit()
                 elif ask == 5:
+                    print("\nLOADING....\n")
+                    time.sleep(1)
+                    with open(person.username + ".txt") as user_hist:
+                        user_trans = user_hist.read()
+                        print("TRANSACTION HISTORY:", user_trans)
+
+                elif ask == 6:
                     break
         if opt == 2:
             person = Customer()
@@ -289,7 +309,7 @@ while True:
                     interest.user_credit()
 
                 elif ask == 3:
-                    withdraw = CheckingAccount(person.account)
+                    withdraw = CheckingAccount(person.account, user=person.username)
                     withdraw.user_credit()
 
                 elif ask == 4:
@@ -305,9 +325,10 @@ while True:
         print("                            WELCOME TO ADMIN SECTION                      ")
         print()
         print("PRESS [0] TO EXIT:\n")
-        username = int(input("INPUT ID:"))
-        password = int(input("INPUT PASSWORD:"))
+
         while True:
+            username = int(input("INPUT ID:"))
+            password = int(input("INPUT PASSWORD:"))
             if username == 123 and password == 123:
                 print()
                 print("     ACCESS GRANTED        ")
@@ -366,28 +387,3 @@ while True:
         print()
 
 
-        # def deposit_amount(self):
-        #     deposit = abs(int(input('Enter Amount to Deposit Money to the Account:')))
-        #     self.balance += deposit
-        #     with open('data.txt', 'r+') as file:
-        #         data = file.readlines()
-        #
-        #         for index, line in enumerate(data):
-        #             temp_user = line.strip().split(',')
-        #             if self.user == temp_user[3]:
-        #                 temp_user[5] = str(self.balance)
-        #                 data[index] = (",".join(temp_user) + "\n")
-        #
-        #                 with open(self.user + ".txt", "a") as user_file:
-        #                     user_file.write(
-        #                         'CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',' + str(
-        #                             deposit) + '\n')
-        #
-        #                 with open('GENERALIZED HISTORY.txt', "a") as hist_file:
-        #                     hist_file.write(
-        #                         self.user + ' :CASH DEPOSITED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        #                         + ',' + str(deposit) + '\n')
-        #
-        #     with open('data.txt', "w") as f:
-        #         for line in data:
-        #             f.write(line)
