@@ -50,6 +50,7 @@ class Account:
 
 
 class CheckingAccount(Account):
+
     def __init__(self, account, credit_limit: int = 3000, user=' '):
         super().__init__(account.balance)
         self.credit_limit = credit_limit
@@ -57,8 +58,8 @@ class CheckingAccount(Account):
 
     def user_credit (self):
         print(f'We provide a credit limit of Rs.{self.credit_limit} with an overdraft fee of Rs.500.\n')
-        while True:
 
+        while True:
             try:
                 withdraw = int(input('Enter Amount to Withdraw Money from Account:'))
                 break
@@ -89,60 +90,89 @@ class CheckingAccount(Account):
                 for line in data:
                     f.write(line)
 
-        elif withdraw <= (self.balance + self.credit_limit):
-            print('You do not have sufficient balance, so it will deduct from the credit limit.')
-            print('And for this, the overdraft fee is Rs.500')
-            amount = self.balance + self.credit_limit
-            self.balance = self.balance - (amount + 500)
-            amount -= withdraw
-            print(f'Withdrawal of Amount {withdraw} is successfully completed with an overdraft fee of Rs.500\n')
+        elif withdraw > self.balance:
+            diff = self.balance - withdraw
+            if diff >= -self.credit_limit:
+                #over_draft = 500
+                print('You do not have sufficient balance, so it will deduct from the credit limit.')
+                print('And for this, the overdraft fee is Rs.500')
+                self.balance = diff - 500
+                with open('data.txt', 'r+') as file:
+                    data = file.readlines()
 
-        else:
-            print('Withdrawal is not possible as you are exceeding the credit limit of the bank.\n')
+                    for index, line in enumerate(data):
+                        temp_user = line.strip().split(',')
+                        if self.user == temp_user[3]:
+                            temp_user[5] = str(self.balance)
+                            data[index] = (",".join(temp_user) + "\n")
+                            with open(self.user + ".txt", "a") as user_file:
+                                user_file.write('CASH WITHDRAWAL INCLUDING OVERDRAFT FEES,' + datetime.now()
+                                                .strftime("%d/%m/%Y %H:%M:%S") + ',' + str(withdraw) + '\n')
 
-        #with open('data.txt', "w") as f:
-        #    for line in data:
-        #        f.write(line)
+                            with open('GENERALIZED HISTORY.txt', "a") as user_file:
+                                user_file.write(
+                                    self.user + ' :CASH WITHDRAWAL INCLUDING OVERDRAFT FEES,' + datetime.now()
+                                    .strftime("%d/%m/%Y %H:%M:%S") + ',' + str(withdraw) + '\n')
+
+                            print(f"CASH WITHDRAWAL OF {withdraw} WSA SUCCESSFUL")
+
+                with open('data.txt', "w") as f:
+                    for line in data:
+                        f.write(line)
+            else:
+                print(f'CANNOT EXCEED CREDIT LIMIT OF THE BANK\n')
 
 
 class SavingAccount(Account):
-    def __init__(self, account, interest=12):
+
+    def __init__(self, account, interest =12):
         super().__init__(account.balance)
         self.interest_rate = interest
 
     def user_credit(self):
-        print(f'We provide a 12% interest rate for our customers.\n')
+        print(f'\nWe provide a 12% interest rate for our customers.\n')
         interest = (self.interest_rate / 100) * self.balance
         print(f'You have got a monthly interest of Rs.{interest}.')
         self.balance += interest
         time.sleep(1)
         print(f'Monthly Interest is Successfully added into your Account.\n')
+        print(f'Your current balance is Rs.{self.balance}.\n')
+        print(f'Monthly Interest is Successfully added into your Account.\n')
         print(f'Your current balance is Rs.{self.balance}.')
 
 
 class LoanAccount(Account):
-    def __init__(self, account, principal_amount=0, interest=15, loan_dur=0):
-        super().__init__(account.balance)
+    def __init__(self, account, principal_amount=0, interest=15, loan_dur=0, loan_user=' '):
+        super().__init__(account)
         self.principal_amount = principal_amount
         self.interest_rate = interest
         self.loan_duration = loan_dur
+        self.loan_user = loan_user
 
     def user_credit(self):
+
         print('We got you covered! Our bank provides loans for your needs, but it has some conditions.')
         print('We have an interest rate of 15% for any amount you want.\n')
+
         self.principal_amount = int(input('Enter amount for the loan:'))
         self.interest_rate = int(15)
         self.loan_duration = int(input('Enter the duration of the loan in months:'))
+
         print(
-            f'You demand an amount for the loan Rs.{self.principal_amount} and settle for the duration of {self.loan_duration} months.')
-        loan = (self.interest_rate / 100) * self.principal_amount
+            f'You demand an amount for the loan Rs.{self.principal_amount} and settle for the duration of {self.loan_duration} months.\n')
+
+        loan = (self.interest_rate / 100) * self.principal_amount * self.loan_duration
         loan = loan + self.principal_amount
         result = loan / self.loan_duration
-        print(f'You have to pay the bank Rs.{round(result, 1)} monthly for {self.loan_duration} months.')
+
+        print(f'You have to pay the bank Rs.{round(result, 1)} monthly for {self.loan_duration} months.\n')
+
+        with open('loan.txt' , "a") as loan_file:
+            loan_file.write(f'{self.loan_user},{loan},{self.interest_rate},{self.loan_duration},{result}\n')
 
 
 class Customer:
-    def __init__(self, f_name='None', l_name='None', address='None', username='None', password='None'):
+    def __init__(self, f_name='None', l_name='None', address='None', username = 'None', password = 'None'):
         self.first_Name = f_name
         self.last_Name = l_name
         self.address = address
@@ -177,9 +207,8 @@ class Customer:
                                 + str (self.account.balance)+'\n')
 
             with open('GENERALIZED HISTORY.txt', "a") as hist_file:
-                hist_file.write(self.username+' :ACCOUNT CREATED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") +" "+
-                                str (self.account.balance) + '\n')
-
+                hist_file.write(self.username+' :ACCOUNT CREATED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + "," +
+                                str(self.account.balance) + '\n')
 
     def reg_account(self):
         while True:
@@ -193,17 +222,31 @@ class Customer:
 
                     if self.username == data[3] and self.password == data[4]:
                         with open(self.username + ".txt", "a") as user_file:
-                            user_file.write('SIGNED IN,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ',None' + '\n')
+                            user_file.write('SIGNED IN,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") +
+                                            ',None' + '\n')
 
                         with open('GENERALIZED HISTORY.txt', "a") as user_file:
                             user_file.write(self.username+' :SIGNED IN,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                                             + ',None' + '\n')
 
+                        print('Searching your Account! Wait...')
+                        time.sleep(1)
+                        print('Loading...')
+                        time.sleep(1.8)
+                        print('\nAccount Verified!')
+                        time.sleep(1)
                         print()
                         print(f'Welcome Back {data[0]} {data[1]}\n')
                         self.account = Account(int(data[5]))
                         print(f'You have a current balance of {data[5]}\n')
+
                         return
+
+            print('Searching your Account! Wait...')
+            time.sleep(1)
+            print('Loading...')
+            time.sleep(1.8)
+
             print('Invalid username or password. Please try again.\n')
 
 
@@ -254,8 +297,86 @@ while True:
                 ask = int(input('Enter Option Number:\n'))
 
                 if ask == 1:
-                    loan = LoanAccount(person.account)
-                    loan.user_credit()
+                    loan = LoanAccount(person.account, loan_user=person.username)
+
+                    with open('loan.txt', 'r') as f:
+                        usernames = set(line.strip().split(',')[0] for line in f)
+
+                    if person.username in usernames:
+                        print("YOU HAVE ALREADY TAKEN THE LOAN\n ")
+                        print("PRESS [0] TO EXIT\n")
+                        loan_input = input("WANT TO PAY IT?\n[Y]for YES [N] for NO: \n").upper()
+
+                        while True:
+                            if loan_input == "Y":
+                                with open("loan.txt", "r") as file:
+                                    data = file.readlines()
+
+                                for index, line in enumerate(data):
+                                    temp_user = line.strip().split(',')
+                                    if person.username == temp_user[0]:
+                                        print ("PRESS [0] TO EXIT\n")
+
+                                        print(f'Hey {person.username}\n\nHOW YOU WANT TO PAY\n 1) {temp_user[4]} MONTHLY'
+                                              f'\n 2)  {temp_user[1]} ALL\n')
+
+                                        loan_in = int(input("ENTER CHOICE:"))
+                                        while True:
+                                            if loan_in == 1:
+
+                                                temp_user[1] = str(int(temp_user[1])-int(temp_user[4]))
+                                                data[index] = (",".join(temp_user) + "\n")
+                                                with open('loan.txt', "w") as f:
+                                                    for line in data:
+                                                        f.write(line)
+
+                                                print(f"\nONE MONTH LOAN HAS BEEN PAYED NOW HAVE TO PAY SAME "
+                                                      f"AMOUNT FOR {int(temp_user[3])-1}\n")
+
+                                                with open(person.username + ".txt", "a") as user_file:
+                                                    user_file.write(
+                                                        'LOAN FOR ONE MONTH CLEARED,' + datetime.now()
+                                                        .strftime("%d/%m/%Y %H:%M:%S") + '\n')
+
+                                                with open('GENERALIZED HISTORY.txt', "a") as user_file:
+                                                    user_file.write(
+                                                        person.username + ' :LOAN FOR ONE MONTH CLEARED ON,' +
+                                                        datetime.now().strftime("%d/%m/%Y %H:%M:%S")+'\n')
+
+                                            elif loan_in == 2:
+
+                                                temp_user[1], temp_user[4], temp_user[3] = 0, 0, 0
+                                                data[index] = (",".join(temp_user) + "\n")
+                                                with open('loan.txt', "w") as f:
+                                                    for line in data:
+                                                        f.write(line)
+
+                                                print(f'LOAN HAS BEEN CLEARED')
+
+                                                with open(person.username + ".txt", "a") as user_file:
+                                                    user_file.write('LOAN CLEARED,' +
+                                                                    datetime.now().strftime("%d/%m/%Y %H:%M:%S") + '\n')
+
+                                                with open('GENERALIZED HISTORY.txt', "a") as user_file:
+                                                    user_file.write(person.username + ' :LOAN CLEARED,' +
+                                                                    datetime.now().strftime("%d/%m/%Y %H:%M:%S") + '\n')
+
+                                            elif loan_in == 0:
+                                                break
+
+                                            else:
+                                                print("TRY AGAIN\n")
+                            elif loan_input == "N":
+                                print("SORRY YOU CANT NOT TAKE FURTHER LOAN")
+
+                            elif loan_input == "0":
+                                break
+
+                            else:
+                                print("INVALID INPUT\nTRYAGAIN\n")
+
+                    else:
+                        loan.user_credit()
 
                 elif ask == 2:
                     interest = SavingAccount(person.account)
@@ -263,7 +384,11 @@ while True:
 
                 elif ask == 3:
                     withdraw = CheckingAccount(person.account, user=person.username)
-                    withdraw.user_credit()
+                    if person.account.balance < 0:
+                        print("YOU ARE ALREADY IN DEBT CANT WITHDRAW\n")
+
+                    else:
+                        withdraw.user_credit()
 
                 elif ask == 4:
                     with open("data.txt","r") as f:
@@ -301,7 +426,7 @@ while True:
                 ask = int(input('Enter Option Number:'))
 
                 if ask == 1:
-                    loan = LoanAccount(person.account)
+                    loan = LoanAccount(person.account, loan_user=person.username)
                     loan.user_credit()
 
                 elif ask == 2:

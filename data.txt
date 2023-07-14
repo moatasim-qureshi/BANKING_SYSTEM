@@ -1,2 +1,3 @@
-Faseeh,qureshi,faseehqureshi,fas,qur,10000
-moatasim,qureshi,moatasimqureshi,moat,qur,990
+Faseeh,qureshi,faseehqureshi,fas,qur,-1000
+moatasim,qureshi,moatasimqureshi,moat,qur,8990
+Ahmed,Khan,Block 15,ahmed,hihello,447500
