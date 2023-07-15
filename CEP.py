@@ -114,7 +114,7 @@ class CheckingAccount(Account):
                                     self.user + ' :CASH WITHDRAWAL INCLUDING OVERDRAFT FEES,' + datetime.now()
                                     .strftime("%d/%m/%Y %H:%M:%S") + ',' + str(withdraw) + '\n')
 
-                            print(f"CASH WITHDRAWAL OF {withdraw} WSA SUCCESSFUL")
+                            print(f"CASH WITHDRAWAL OF {withdraw} WAS SUCCESSFUL")
 
                 with open('data.txt', "w") as f:
                     for line in data:
@@ -162,13 +162,20 @@ class LoanAccount(Account):
             f'You demand an amount for the loan Rs.{self.principal_amount} and settle for the duration of {self.loan_duration} months.\n')
 
         loan = (self.interest_rate / 100) * self.principal_amount * self.loan_duration
-        loan = loan + self.principal_amount
-        result = loan / self.loan_duration
+        loan =int( loan + self.principal_amount)
+        result = int(loan / self.loan_duration)
 
         print(f'You have to pay the bank Rs.{round(result, 1)} monthly for {self.loan_duration} months.\n')
 
-        with open('loan.txt' , "a") as loan_file:
+        with open('loan.txt', "a") as loan_file:
             loan_file.write(f'{self.loan_user},{loan},{self.interest_rate},{self.loan_duration},{result}\n')
+
+        with open(self.loan_user+'.txt', "a") as loan_file:
+            loan_file.write('LOAN TAKEN ON ' + str(loan) + 'ON' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")+'\n')
+
+        with open('GENERALIZED HISTORY.txt', "a") as loan_file:
+            loan_file.write(self.loan_user+':LOAN TAKEN ON ' + str(loan) + 'ON' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")+'\n')
+
 
 
 class Customer:
@@ -325,31 +332,42 @@ while True:
                                             if loan_in == 1:
 
                                                 temp_user[1] = str(int(temp_user[1])-int(temp_user[4]))
+                                                temp_user[3] = str(int(temp_user[3]) - 1)
                                                 data[index] = (",".join(temp_user) + "\n")
-                                                with open('loan.txt', "w") as f:
-                                                    for line in data:
-                                                        f.write(line)
 
-                                                print(f"\nONE MONTH LOAN HAS BEEN PAYED NOW HAVE TO PAY SAME "
-                                                      f"AMOUNT FOR {int(temp_user[3])-1}\n")
+                                                if temp_user[1] == "0":
+                                                    del data[index]
+                                                    print("LOAN CLEARED\n")
+                                                    with open(person.username + ".txt", "a") as user_file:
+                                                        user_file.write(
+                                                            'LOAN CLEARED ON,' + datetime.now()
+                                                            .strftime("%d/%m/%Y %H:%M:%S") + '\n')
 
-                                                with open(person.username + ".txt", "a") as user_file:
-                                                    user_file.write(
-                                                        'LOAN FOR ONE MONTH CLEARED,' + datetime.now()
-                                                        .strftime("%d/%m/%Y %H:%M:%S") + '\n')
+                                                    with open('GENERALIZED HISTORY.txt', "a") as user_file:
+                                                        user_file.write(
+                                                            person.username + ' :LOAN CLEARED ON,' +
+                                                            datetime.now().strftime("%d/%m/%Y %H:%M:%S") + '\n')
 
-                                                with open('GENERALIZED HISTORY.txt', "a") as user_file:
-                                                    user_file.write(
-                                                        person.username + ' :LOAN FOR ONE MONTH CLEARED ON,' +
-                                                        datetime.now().strftime("%d/%m/%Y %H:%M:%S")+'\n')
+                                                else:
+                                                    pass
+                                                    print(f"\nONE MONTH LOAN HAS BEEN PAYED NOW HAVE TO PAY SAME "
+                                                          f"AMOUNT FOR {int(temp_user[3])} MONTHS\n")
 
+                                                    with open(person.username + ".txt", "a") as user_file:
+                                                        user_file.write(
+                                                            'LOAN FOR ONE MONTH CLEARED,' + datetime.now()
+                                                            .strftime("%d/%m/%Y %H:%M:%S") + '\n')
+
+                                                    with open('GENERALIZED HISTORY.txt', "a") as user_file:
+                                                        user_file.write(
+                                                            person.username + ' :LOAN FOR ONE MONTH CLEARED ON,' +
+                                                            datetime.now().strftime("%d/%m/%Y %H:%M:%S")+'\n')
+
+                                                break
                                             elif loan_in == 2:
 
-                                                temp_user[1], temp_user[4], temp_user[3] = 0, 0, 0
+                                                temp_user[1], temp_user[4], temp_user[3] = str(0), str(0), str(0)
                                                 data[index] = (",".join(temp_user) + "\n")
-                                                with open('loan.txt', "w") as f:
-                                                    for line in data:
-                                                        f.write(line)
 
                                                 print(f'LOAN HAS BEEN CLEARED')
 
@@ -361,13 +379,26 @@ while True:
                                                     user_file.write(person.username + ' :LOAN CLEARED,' +
                                                                     datetime.now().strftime("%d/%m/%Y %H:%M:%S") + '\n')
 
+                                                del data[index]
+                                                break
+
                                             elif loan_in == 0:
                                                 break
 
                                             else:
                                                 print("TRY AGAIN\n")
+
+                                        break
+
+                                with open('loan.txt', "w") as f:
+                                    for line in data:
+                                        f.write(line)
+
+                                break
+
                             elif loan_input == "N":
                                 print("SORRY YOU CANT NOT TAKE FURTHER LOAN")
+                                break
 
                             elif loan_input == "0":
                                 break
