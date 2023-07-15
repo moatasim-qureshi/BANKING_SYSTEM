@@ -1,6 +1,7 @@
 from datetime import datetime
 import time
 from abc import ABC, abstractmethod
+import datetime
 
 
 class Account:
@@ -240,12 +241,12 @@ class Customer:
             time.sleep(1.5)
 
             with open(self.username + ".txt", "w") as user_file:
-                user_file.write('ACCOUNT CREATED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ','
+                user_file.write('ACCOUNT CREATED,' + str(datetime.date.today()) + ','
                                 + str(self.account.balance) + '\n')
 
             with open('GENERALIZED HISTORY.txt', "a") as hist_file:
                 hist_file.write(
-                    self.username + ' :ACCOUNT CREATED,' + datetime.now().strftime("%d/%m/%Y %H:%M:%S") + "," +
+                    self.username + ' :ACCOUNT CREATED,' + str(datetime.date.today()) + "," +
                     str(self.account.balance) + '\n')
 
     def reg_account(self):
