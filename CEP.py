@@ -1,12 +1,11 @@
 from datetime import datetime
 import time
 
-
 class Account:
-    def __init__(self, balance,user=' '):
+    def __init__(self, balance, user=' '):
 
         self.balance = balance
-        self.user=user
+        self.user = user
 
     def deposit(self):
         deposit = abs(int(input('Enter Amount to Deposit Money to the Account:')))
@@ -34,8 +33,6 @@ class Account:
             with open('data.txt', "w") as f:
                 for line in data:
                     f.write(line)
-
-
 
     def withdraw(self):
         amount = int(input('Enter amount of withdrawal:'))
@@ -162,7 +159,7 @@ class LoanAccount(Account):
             f'You demand an amount for the loan Rs.{self.principal_amount} and settle for the duration of {self.loan_duration} months.\n')
 
         loan = (self.interest_rate / 100) * self.principal_amount * self.loan_duration
-        loan =int( loan + self.principal_amount)
+        loan =int(loan + self.principal_amount)
         result = int(loan / self.loan_duration)
 
         print(f'You have to pay the bank Rs.{round(result, 1)} monthly for {self.loan_duration} months.\n')
@@ -175,7 +172,6 @@ class LoanAccount(Account):
 
         with open('GENERALIZED HISTORY.txt', "a") as loan_file:
             loan_file.write(self.loan_user+':LOAN TAKEN ON ' + str(loan) + 'ON' + datetime.now().strftime("%d/%m/%Y %H:%M:%S")+'\n')
-
 
 
 class Customer:
@@ -286,7 +282,7 @@ while True:
         print('Press 2 to create an Account')
         print('Press 3 to exit')
 
-        opt = int(input('Enter Option Number:'))
+        opt = int(input('Enter Option Number:\n'))
 
         if opt == 1:
             person = Customer()
@@ -523,16 +519,19 @@ while True:
 
                                     with open(take+".txt") as user_hist:
                                         user_trans = user_hist.read()
-                                        print("TRANSACTION HISTORY:", user_trans)
+                                        print("TRANSACTION HISTORY:\n", user_trans)
                     elif choice == 3:
                         print("OVERALL TRANSACTION HISTORY")
-                        print("\nLOADNIG.....\n")
+                        time.sleep(1)
+                        print("\nLOADING.....\n")
+                        time.sleep(1)
 
-                        with open("GENERALIZED HISTORY.txt","r") as hist:
-                            overall_hist=hist.read()
-                            print("TRANSACTION HISTORY OF BANK\n\n", overall_hist)
+                        with open("GENERALIZED HISTORY.txt", "r") as hist:
+                            overall_hist = hist.read()
+                            print("TRANSACTION HISTORY OF BANK\n\n",overall_hist)
 
             elif username == 0 or password == 0:
+                print()
                 break
 
             else:
